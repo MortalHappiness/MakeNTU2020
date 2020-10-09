@@ -1,0 +1,20 @@
+[
+  {
+    "name": "store1",
+    "latitude": 23.5,
+    "longitude": 121,
+    "max_capacity": 10
+  },
+  {
+    "name": "store2",
+    "latitude": 23.4,
+    "longitude": 122,
+    "max_capacity": 20
+  },
+  {
+    "name": "邦",
+    "latitude": 23.3,
+    "longitude": 123,
+    "max_capacity": 30
+  }
+]

@@ -14,11 +14,24 @@ Write the following content into `.env`
 FLASK_DEBUG=1
 LINE_CHANNEL_SECRET=YOUR_CHANNEL_SECRET
 LINE_CHANNEL_ACCESS_TOKEN=YOUR_CHANNEL_ACCESS_TOKEN
+MONGO_HOST=localhost
+MONGO_DB_NAME=makentu2020
 ```
 
-Run the following command
+Setting environment variables
 
 ```
 export FLASK_ENV=development
+```
+
+Reset database
+
+```
+python mongo.py
+```
+
+Start server
+
+```
 python server.py
 ```
