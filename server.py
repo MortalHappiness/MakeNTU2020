@@ -11,7 +11,7 @@ from linebot.models import MessageEvent, TextMessage, TextSendMessage
 
 # ========================================
 
-if os. getenv('MODE') == 'dev':
+if os. getenv('FLASK_ENV') == 'development':
     load_dotenv()
 
 PORT = os.getenv('PORT', 8000)
@@ -36,7 +36,7 @@ handler = WebhookHandler(LINE_CHANNEL_SECRET)
 
 @app.route("/")
 def index():
-    return "Hi"
+    return "Hii"
 
 
 @app.route("/callback", methods=['POST'])
