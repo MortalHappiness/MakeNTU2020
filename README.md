@@ -18,5 +18,6 @@ LINE_CHANNEL_ACCESS_TOKEN={your channel access token here}
 Run the following command
 
 ```
+export MODE=dev
 python server.py
 ```
