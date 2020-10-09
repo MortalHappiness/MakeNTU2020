@@ -11,8 +11,8 @@ pip install -r requirements.txt
 Write the following content into `.env`
 
 ```
-LINE_CHANNEL_SECRET={your channel secret here}
-LINE_CHANNEL_ACCESS_TOKEN={your channel access token here}
+LINE_CHANNEL_SECRET=YOUR_CHANNEL_SECRET
+LINE_CHANNEL_ACCESS_TOKEN=YOUR_CHANNEL_ACCESS_TOKEN
 ```
 
 Run the following command
