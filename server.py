@@ -101,7 +101,7 @@ def get_reply(text):
 
     if text.startswith("#"):
         store_name = text[1:]
-        store = db.stores.find_one({"name": store_name})
+        store = db.stores.find_one({"name": store_name}, {"_id": False})
         if store is None:
             return f'Sorry, store "{store_name}" is not in our database!'
         return str(store)
@@ -109,6 +109,7 @@ def get_reply(text):
     return HELP_MESSAGE
 
 # ========================================
+
 
 if __name__ == '__main__':
     app.run(port=PORT)

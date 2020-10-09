@@ -35,3 +35,11 @@ Start server
 ```
 python server.py
 ```
+
+Use [ngrok](https://ngrok.com/) to test our linebot
+
+```
+ngrok http 8000
+```
+
+Modify your webhook URL to `https://{YOUR_NGROK_TUNNEL_ID}.ngrok.io/callback`
