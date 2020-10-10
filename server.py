@@ -253,6 +253,7 @@ def api_pop_user():
                                     )
     if is_queuing is None:
         return "The user is not queuing now!"
+    queuing_num = is_queuing["queuing_people"][0]["num"]
     result = db.stores.aggregate([
         {"$match": {"name": store_name}},
         {"$project":
@@ -264,9 +265,13 @@ def api_pop_user():
     if queuing_index != 0:
         return "The user is not line at the first!"
     store = db.stores.find_one({"name": store_name})
+    if len(store["queuing_people"]) == 1:
+        queuing_num = 0
     db.stores.update_one({"name": store_name,
                           "queuing_people.user_id": user_id},
-                         {"$pull": {"queuing_people": {"user_id": user_id}}}
+                         {"$pull": {"queuing_people": {"user_id": user_id}},
+                          "$set": {"last_num": queuing_num},
+                          }
                          )
     line_bot_api.push_message(
         user_id,
@@ -479,7 +484,7 @@ def get_reply(user_id, text):
                     )
                 )
         else:  # not is_full
-            if len(store["queuing_people"])>0:
+            if len(store["queuing_people"]) > 0:
                 text_information = {
                     "目前排隊編號": store["last_num"],
                 }
