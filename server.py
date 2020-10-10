@@ -75,6 +75,8 @@ HELP_MESSAGE = """指令教學：
 也可以從螢幕下方的選單顯示地圖與教學～
 祝您使用愉快 """
 
+QUEUE_SEND_MESSAGE_NUM = 2
+
 # ========================================
 
 
@@ -309,10 +311,23 @@ def get_reply(user_id, text):
                                         )
         if is_queuing is None:
             return TextSendMessage(text=f"您沒有在排隊，故無法取消排隊")
+        result = db.stores.aggregate([
+            {"$match": {"name": store_name}},
+            {"$project":
+                {"matchedIndex":
+                    {"$indexOfArray": ["$queuing_people.user_id", user_id]}
+                 }
+             }])
+        queuing_index = list(result)[0]["matchedIndex"]
         db.stores.update_one({"name": store_name,
                               "queuing_people.user_id": user_id},
                              {"$pull": {"queuing_people": {"user_id": user_id}}}
                              )
+        if queuing_index in [0, 1]:
+            line_bot_api.push_message(
+                store["queuing_people"][QUEUE_SEND_MESSAGE_NUM]["user_id"],
+                TextSendMessage(
+                    text=f"{store['name']}的排隊快輪到您了，請留意排隊進度"))
         return TextSendMessage(text="取消排隊成功！")
 
     return TextSendMessage(text=HELP_MESSAGE)
