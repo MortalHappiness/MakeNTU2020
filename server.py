@@ -213,6 +213,8 @@ def get_reply(user_id, text):
                     alt_text="is_full and not is_queuing",
                     template=ButtonsTemplate(
                         title=store_name,
+                        thumbnail_image_url=SERVER_HOST +
+                        "/images/" + store["image"],
                         text=f"目前已滿\n排隊人數：{len(store['queuing_people'])}",
                         actions=[
                             {
@@ -237,6 +239,8 @@ def get_reply(user_id, text):
                 alt_text="not is_full",
                 template=ButtonsTemplate(
                     title=store_name,
+                    thumbnail_image_url=SERVER_HOST +
+                    "/images/" + store["image"],
                     text="\n".join(
                         [f"{k}： {v}" for k, v in store_information.items()]
                     ),
