@@ -1,9 +1,20 @@
 import os
+import uuid
+import urllib.parse
 from io import BytesIO
 
 import qrcode
 from dotenv import load_dotenv
-from flask import Flask, request, abort, send_file, send_from_directory
+from flask import (
+    Flask,
+    request,
+    abort,
+    session,
+    send_file,
+    send_from_directory,
+    redirect,
+    render_template,
+)
 from pymongo import MongoClient
 
 from linebot import LineBotApi, WebhookHandler
@@ -21,7 +32,8 @@ from linebot.models import (
     MessageTemplateAction,
     QuickReply,
     QuickReplyButton,
-    MessageAction
+    MessageAction,
+    ConfirmTemplate,
 )
 import qrcode
 
@@ -57,7 +69,8 @@ if SERVER_HOST is None:
 # ========================================
 
 
-app = Flask(__name__)
+app = Flask(__name__, template_folder="templates")
+app.secret_key = str(uuid.uuid1().hex)
 
 line_bot_api = LineBotApi(LINE_CHANNEL_ACCESS_TOKEN)
 handler = WebhookHandler(LINE_CHANNEL_SECRET)
@@ -92,9 +105,19 @@ def index():
     return "Hi"
 
 
+@app.route("/login")
+def login():
+    return render_template("login.html")
+
+
 @app.route('/images/<path:path>')
-def send_image(path):
+def send_images(path):
     return send_from_directory('images', path)
+
+
+@app.route('/static/<path:path>')
+def send_static(path):
+    return send_from_directory('static', path)
 
 
 @app.route("/callback", methods=['POST'])
@@ -147,11 +170,12 @@ def api_current_people():
     return "", 200
 
 
-@app.route("/api/qrcode/<user_id>", methods=["GET"])
-def api_qrcode(user_id):
-    if len(user_id) > 50:
+@app.route("/api/qrcode", methods=["GET"])
+def api_qrcode():
+    data = request.args.get("data", None)
+    if data is None:
         abort(400)
-    pil_img = qrcode.make(user_id)
+    pil_img = qrcode.make(data)
     img_io = BytesIO()
     pil_img.save(img_io, 'JPEG', quality=70)
     img_io.seek(0)
@@ -187,6 +211,59 @@ def api_map():
 def api_map_path(path):
     return send_from_directory('map', path)
 
+
+@app.route("/api/session", methods=["POST"])
+def api_session():
+    username = request.form.get("username", None)
+    password = request.form.get("password", None)
+    if username is None or password is None:
+        abort(400)
+    result = db.stores.find_one({"name": username, "secret_key": password})
+    if result is None:
+        abort(403)
+    session["username"] = username
+    return "Login successfully!", 200
+
+
+@app.route("/api/pop-user", methods=["GET"])
+def api_pop_user():
+    store_name = session.get("username", None)
+    if store_name is None:
+        return redirect("/login")
+    user_id = request.args.get("userid", None)
+    is_queuing = db.stores.find_one({"name": store_name,
+                                     "queuing_people.user_id": user_id},
+                                    {"queuing_people.$": True}
+                                    )
+    if is_queuing is None:
+        return "The user is not queuing now!"
+    result = db.stores.aggregate([
+        {"$match": {"name": store_name}},
+        {"$project":
+         {"matchedIndex":
+          {"$indexOfArray": ["$queuing_people.user_id", user_id]}
+          }
+         }])
+    queuing_index = list(result)[0]["matchedIndex"]
+    if queuing_index != 0:
+        return "The user is not line at the first!"
+    store = db.stores.find_one({"name": store_name})
+    db.stores.update_one({"name": store_name,
+                          "queuing_people.user_id": user_id},
+                         {"$pull": {"queuing_people": {"user_id": user_id}}}
+                         )
+    line_bot_api.push_message(
+        user_id,
+        TextSendMessage(
+            text=f"你已成功進入店家！"))
+    if len(store["queuing_people"]) > QUEUE_SEND_MESSAGE_NUM:
+        line_bot_api.push_message(
+            store["queuing_people"][QUEUE_SEND_MESSAGE_NUM]["user_id"],
+            TextSendMessage(
+                text=f"{store['name']}的排隊快輪到您了，請留意排隊進度"))
+
+    return "Successfully pop the user!"
+
 # ========================================
 
 
@@ -200,107 +277,110 @@ def handle_message(event):
 # ========================================
 
 QuickReply_text_message_help = TextSendMessage(
-    text = HELP_MESSAGE,
-        quick_reply = QuickReply(
-            items = [ 
-                QuickReplyButton(
-                    action = MessageAction(label = "#邦食堂", text = "#邦食堂"), 
-                ), 
-                QuickReplyButton( 
-                      action = MessageAction(label = "#微笑廚房", text = "#微笑廚房"), 
-                ), 
-                QuickReplyButton( 
-                    action = MessageAction(label = "#五九麵館", text = "#五九麵館"), 
-                ), 
-                QuickReplyButton( 
-                    action = MessageAction(label = "#大李水餃", text = "#大李水餃"), 
-                ),
-                QuickReplyButton( 
-                    action = MessageAction(label = "#合益佳雞肉飯", text = "#合益佳雞肉飯"), 
-                )
-            ] ) ) 
+    text=HELP_MESSAGE,
+    quick_reply=QuickReply(
+        items=[
+            QuickReplyButton(
+                action=MessageAction(label="#邦食堂", text="#邦食堂"),
+            ),
+            QuickReplyButton(
+                action=MessageAction(label="#微笑廚房", text="#微笑廚房"),
+            ),
+            QuickReplyButton(
+                action=MessageAction(label="#五九麵館", text="#五九麵館"),
+            ),
+            QuickReplyButton(
+                action=MessageAction(label="#大李水餃", text="#大李水餃"),
+            ),
+            QuickReplyButton(
+                action=MessageAction(label="#合益佳雞肉飯", text="#合益佳雞肉飯"),
+            )
+        ]))
 
 QuickReply_text_message_nostore = TextSendMessage(
-    text = "抱歉，查無此店",
-        quick_reply = QuickReply(
-            items = [ 
-                QuickReplyButton(
-                    action = MessageAction(label = "#邦食堂", text = "#邦食堂"), 
-                ), 
-                QuickReplyButton( 
-                      action = MessageAction(label = "#微笑廚房", text = "#微笑廚房"), 
-                ), 
-                QuickReplyButton( 
-                    action = MessageAction(label = "#五九麵館", text = "#五九麵館"), 
-                ), 
-                QuickReplyButton( 
-                    action = MessageAction(label = "#大李水餃", text = "#大李水餃"), 
-                ),
-                QuickReplyButton( 
-                    action = MessageAction(label = "#合益佳雞肉飯", text = "#合益佳雞肉飯"), 
-                )
-            ] ) ) 
+    text="抱歉，查無此店",
+    quick_reply=QuickReply(
+        items=[
+            QuickReplyButton(
+                action=MessageAction(label="#邦食堂", text="#邦食堂"),
+            ),
+            QuickReplyButton(
+                action=MessageAction(label="#微笑廚房", text="#微笑廚房"),
+            ),
+            QuickReplyButton(
+                action=MessageAction(label="#五九麵館", text="#五九麵館"),
+            ),
+            QuickReplyButton(
+                action=MessageAction(label="#大李水餃", text="#大李水餃"),
+            ),
+            QuickReplyButton(
+                action=MessageAction(label="#合益佳雞肉飯", text="#合益佳雞肉飯"),
+            )
+        ]))
 
 QuickReply_text_message_nostore_lineup = TextSendMessage(
-    text = "抱歉，查無此店",
-        quick_reply = QuickReply(
-            items = [ 
-                QuickReplyButton(
-                    action = MessageAction(label = "我要排隊：邦食堂", text = "我要排隊：邦食堂"), 
-                ), 
-                QuickReplyButton( 
-                      action = MessageAction(label = "我要排隊：微笑廚房", text = "我要排隊：微笑廚房"), 
-                ), 
-                QuickReplyButton( 
-                    action = MessageAction(label = "我要排隊：五九麵館", text = "我要排隊：五九麵館"), 
-                ), 
-                QuickReplyButton( 
-                    action = MessageAction(label = "我要排隊：大李水餃", text = "我要排隊：大李水餃"), 
-                ),
-                QuickReplyButton( 
-                    action = MessageAction(label = "我要排隊：合益佳雞肉飯", text = "我要排隊：合益佳雞肉飯"), 
-                )
-            ] ) ) 
+    text="抱歉，查無此店",
+    quick_reply=QuickReply(
+        items=[
+            QuickReplyButton(
+                action=MessageAction(label="我要排隊：邦食堂", text="我要排隊：邦食堂"),
+            ),
+            QuickReplyButton(
+                action=MessageAction(label="我要排隊：微笑廚房", text="我要排隊：微笑廚房"),
+            ),
+            QuickReplyButton(
+                action=MessageAction(label="我要排隊：五九麵館", text="我要排隊：五九麵館"),
+            ),
+            QuickReplyButton(
+                action=MessageAction(label="我要排隊：大李水餃", text="我要排隊：大李水餃"),
+            ),
+            QuickReplyButton(
+                action=MessageAction(
+                    label="我要排隊：合益佳雞肉飯", text="我要排隊：合益佳雞肉飯"),
+            )
+        ]))
 
 QuickReply_text_message_nostore_cancel = TextSendMessage(
-    text = "抱歉，查無此店",
-        quick_reply = QuickReply(
-            items = [ 
-                QuickReplyButton(
-                    action = MessageAction(label = "取消排隊：邦食堂", text = "取消排隊：邦食堂"), 
-                ), 
-                QuickReplyButton( 
-                      action = MessageAction(label = "取消排隊：微笑廚房", text = "取消排隊：微笑廚房"), 
-                ), 
-                QuickReplyButton( 
-                    action = MessageAction(label = "取消排隊：五九麵館", text = "取消排隊：五九麵館"), 
-                ), 
-                QuickReplyButton( 
-                    action = MessageAction(label = "取消排隊：大李水餃", text = "取消排隊：大李水餃"), 
-                ),
-                QuickReplyButton( 
-                    action = MessageAction(label = "取消排隊：合益佳雞肉飯", text = "取消排隊：合益佳雞肉飯"), 
-                )
-            ] ) ) 
+    text="抱歉，查無此店",
+    quick_reply=QuickReply(
+        items=[
+            QuickReplyButton(
+                action=MessageAction(label="取消排隊：邦食堂", text="取消排隊：邦食堂"),
+            ),
+            QuickReplyButton(
+                action=MessageAction(label="取消排隊：微笑廚房", text="取消排隊：微笑廚房"),
+            ),
+            QuickReplyButton(
+                action=MessageAction(label="取消排隊：五九麵館", text="取消排隊：五九麵館"),
+            ),
+            QuickReplyButton(
+                action=MessageAction(label="取消排隊：大李水餃", text="取消排隊：大李水餃"),
+            ),
+            QuickReplyButton(
+                action=MessageAction(
+                    label="取消排隊：合益佳雞肉飯", text="取消排隊：合益佳雞肉飯"),
+            )
+        ]))
 
 Confirm_template = TemplateSendMessage(
-        alt_text='目錄 template',
-        template=ConfirmTemplate(
-            title='確定取消？',
-            text='確定要取消排隊？',
-            actions=[                              
-                MessageTemplateAction(
-                    label='Yes',
-                    text='Yes'
-                ),
-                MessageTemplateAction(
-                    label='No',
-                    text='No'
-                )
-            ])
-          )
+    alt_text='目錄 template',
+    template=ConfirmTemplate(
+        title='確定取消？',
+        text='確定要取消排隊？',
+        actions=[
+            MessageTemplateAction(
+                label='Yes',
+                text='Yes'
+            ),
+            MessageTemplateAction(
+                label='No',
+                text='No'
+            )
+        ])
+)
 
 # ========================================
+
 
 def get_reply(user_id, text):
     """
@@ -438,7 +518,10 @@ def get_reply(user_id, text):
                              {"$push": {"queuing_people": {
                                  "user_id": user_id, "num": max_num + 1}}}
                              )
-        qrcode_url = SERVER_HOST + "/api/qrcode/" + user_id
+        qrcode_url = (SERVER_HOST + "/api/qrcode?data=" +
+                      urllib.parse.quote(SERVER_HOST + "/api/pop-user?userid=" +
+                                         user_id, safe="")
+                      )
         return [TextSendMessage(text=f"排隊成功！你的編號是{max_num + 1}號"),
                 ImageSendMessage(original_content_url=qrcode_url,
                                  preview_image_url=qrcode_url),
@@ -477,113 +560,113 @@ def get_reply(user_id, text):
                               "queuing_people.user_id": user_id},
                              {"$pull": {"queuing_people": {"user_id": user_id}}}
                              )
-        if queuing_index in [0, 1] and len(store["queuing_people"])>2:
+
+        if (queuing_index in [0, 1] and
+                len(store["queuing_people"]) > QUEUE_SEND_MESSAGE_NUM):
             line_bot_api.push_message(
                 store["queuing_people"][QUEUE_SEND_MESSAGE_NUM]["user_id"],
                 TextSendMessage(
                     text=f"{store['name']}的排隊快輪到您了，請留意排隊進度"))
         return TextSendMessage(text="取消排隊成功！")
 
-      
     if text == "吃什麼":
         return TemplateSendMessage(
-        alt_text='Carousel template',
-        template=CarouselTemplate(
-        columns=[
-            CarouselColumn(
-                thumbnail_image_url=SERVER_HOST +
-                    "/images/" + "smile.jpeg",
-                title='微笑廚房',
-                text='106台北市大安區和平東路二段118巷54弄3號',
-                actions=[
-                    {
-                        "type": "uri",
-                        "label": "地圖",
-                        "uri": SERVER_HOST + "/api/map"
-                    },
-                    {
-                        "type": "uri",
-                        "label": "Facebook",
-                        "uri": "https://www.facebook.com/smileadam11"
-                    },
-                ]
-            ),
-            CarouselColumn(
-                thumbnail_image_url=SERVER_HOST +
-                    "/images/" + "大李.jpeg",
-                title='大李水餃',
-                text='106台北市大安區和平東路二段118巷54弄35號',
-                actions=[
-                    {
-                        "type": "uri",
-                        "label": "地圖",
-                        "uri": SERVER_HOST + "/api/map"
-                    },
-                    {
-                        "type": "uri",
-                        "label": "Facebook",
-                        "uri": "https://www.facebook.com/pages/%E5%A4%A7%E6%9D%8E%E6%B0%B4%E9%A4%83/177588238954445/"
-                    },
-                ]
-            ),
-            CarouselColumn(
-                thumbnail_image_url=SERVER_HOST +
-                    "/images/" + "五九.jpg",
-                title='五九麵館',
-                text='106台北市大安區和平東路二段118巷57-1號',
-                actions=[
-                    {
-                        "type": "uri",
-                        "label": "地圖",
-                        "uri": SERVER_HOST + "/api/map"
-                    },
-                    {
-                        "type": "uri",
-                        "label": "Facebook",
-                        "uri": "https://www.facebook.com/%E4%BA%94%E4%B9%9D%E9%BA%B5%E9%A4%A8-860910354254432"
-                    },
-                ]
-            ),
-            CarouselColumn(
-                thumbnail_image_url=SERVER_HOST +
-                    "/images/" + "合益佳.jpg",
-                title='合益佳雞肉飯',
-                text='106台北市大安區和平東路二段118巷54弄7號',
-                actions=[
-                    {
-                        "type": "uri",
-                        "label": "地圖",
-                        "uri": SERVER_HOST + "/api/map"
-                    },
-                    {
-                        "type": "uri",
-                        "label": "Facebook",
-                        "uri": "https://www.facebook.com/ntueater/posts/703330173174981/"
-                    },
-                ]
-            ),
-            CarouselColumn(
-                thumbnail_image_url=SERVER_HOST +
-                    "/images/" + "banshokudou.png",
-                title='邦食堂',
-                text='106台北市大安區和平東路二段96巷17弄28號',
-                actions=[
-                    {
-                        "type": "uri",
-                        "label": "地圖",
-                        "uri": SERVER_HOST + "/api/map"
-                    },
-                    {
-                        "type": "uri",
-                        "label": "Facebook",
-                        "uri": "https://www.facebook.com/banfoodplace/"
-                    },
+            alt_text='Carousel template',
+            template=CarouselTemplate(
+                columns=[
+                    CarouselColumn(
+                        thumbnail_image_url=SERVER_HOST +
+                        "/images/" + "smile.jpeg",
+                        title='微笑廚房',
+                        text='106台北市大安區和平東路二段118巷54弄3號',
+                        actions=[
+                            {
+                                "type": "uri",
+                                "label": "地圖",
+                                "uri": SERVER_HOST + "/api/map"
+                            },
+                            {
+                                "type": "uri",
+                                "label": "Facebook",
+                                "uri": "https://www.facebook.com/smileadam11"
+                            },
+                        ]
+                    ),
+                    CarouselColumn(
+                        thumbnail_image_url=SERVER_HOST +
+                        "/images/" + "大李.jpeg",
+                        title='大李水餃',
+                        text='106台北市大安區和平東路二段118巷54弄35號',
+                        actions=[
+                            {
+                                "type": "uri",
+                                "label": "地圖",
+                                "uri": SERVER_HOST + "/api/map"
+                            },
+                            {
+                                "type": "uri",
+                                "label": "Facebook",
+                                "uri": "https://www.facebook.com/pages/%E5%A4%A7%E6%9D%8E%E6%B0%B4%E9%A4%83/177588238954445/"
+                            },
+                        ]
+                    ),
+                    CarouselColumn(
+                        thumbnail_image_url=SERVER_HOST +
+                        "/images/" + "五九.jpg",
+                        title='五九麵館',
+                        text='106台北市大安區和平東路二段118巷57-1號',
+                        actions=[
+                            {
+                                "type": "uri",
+                                "label": "地圖",
+                                "uri": SERVER_HOST + "/api/map"
+                            },
+                            {
+                                "type": "uri",
+                                "label": "Facebook",
+                                "uri": "https://www.facebook.com/%E4%BA%94%E4%B9%9D%E9%BA%B5%E9%A4%A8-860910354254432"
+                            },
+                        ]
+                    ),
+                    CarouselColumn(
+                        thumbnail_image_url=SERVER_HOST +
+                        "/images/" + "合益佳.jpg",
+                        title='合益佳雞肉飯',
+                        text='106台北市大安區和平東路二段118巷54弄7號',
+                        actions=[
+                            {
+                                "type": "uri",
+                                "label": "地圖",
+                                "uri": SERVER_HOST + "/api/map"
+                            },
+                            {
+                                "type": "uri",
+                                "label": "Facebook",
+                                "uri": "https://www.facebook.com/ntueater/posts/703330173174981/"
+                            },
+                        ]
+                    ),
+                    CarouselColumn(
+                        thumbnail_image_url=SERVER_HOST +
+                        "/images/" + "banshokudou.png",
+                        title='邦食堂',
+                        text='106台北市大安區和平東路二段96巷17弄28號',
+                        actions=[
+                            {
+                                "type": "uri",
+                                "label": "地圖",
+                                "uri": SERVER_HOST + "/api/map"
+                            },
+                            {
+                                "type": "uri",
+                                "label": "Facebook",
+                                "uri": "https://www.facebook.com/banfoodplace/"
+                            },
+                        ]
+                    )
                 ]
             )
-        ]
         )
-        )
-
 
     return QuickReply_text_message_help
 
