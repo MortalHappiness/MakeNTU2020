@@ -16,6 +16,10 @@ def get_max_capacity(url, store_name):
     r = requests.get(url + "/api/max-capacity?name=" + store_name)
     return r.ok, r.content, r.status_code
 
+def get_last_num(url, store_name):
+    r = requests.get(url + "/api/last_num?name=" + store_name)
+    return r.ok, r.content, r.status_code
+
 # ========================================
 
 
