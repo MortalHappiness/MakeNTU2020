@@ -155,7 +155,7 @@ def get_reply(user_id, text):
                                         {"queuing_people.$": True}
                                         )
         if is_full:
-            if is_queuing:
+            if is_queuing is not None:
                 text_information = {
                     "目前排隊編號": store["last_num"],
                     "您的編號": is_queuing["queuing_people"][0]["num"],
