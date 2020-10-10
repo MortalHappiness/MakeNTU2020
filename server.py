@@ -79,7 +79,35 @@ def callback():
     return 'OK'
 
 
-@handler.add(MessageEvent, message=TextMessage)
+@app.route("/api/current-people", methods=['PUT'])
+def api():
+    if (type(request.json) != dict):
+        abort(400)
+    try:
+        store_name = request.json["store_name"]
+        secret_key = request.json["secret_key"]
+        current_people = request.json["current_people"]
+    except KeyError:
+        abort(400)
+    if (type(store_name) != str or type(secret_key) != str or
+            type(current_people) != int):
+        abort(400)
+    store = db.stores.find_one({"name": store_name})
+    if store is None:
+        return "No such store_name", 400
+    if secret_key != store["secret_key"]:
+        abort(403)
+    if not (0 <= current_people <= store["max_capacity"]):
+        return ("current_people should in the range " +
+                f"[0, {store['max_capacity']}]", 400)
+    db.stores.update_one({"name": store_name}, {
+                         "$set": {"current_people": current_people}})
+    return "", 200
+
+# ========================================
+
+
+@ handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
     # Decide what Component to return to Channel
     reply_text = get_reply(event.message.text)
