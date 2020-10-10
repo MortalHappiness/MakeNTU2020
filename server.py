@@ -130,7 +130,6 @@ def handle_message(event):
     line_bot_api.reply_message(event.reply_token, reply)
 
 
-
 # ========================================
 
 
@@ -150,29 +149,62 @@ def get_reply(user_id, text):
             return TextSendMessage(text=f'抱歉，查無此店')
         assert 0 <= store["current_people"] <= store["max_capacity"]
         is_full = (store["current_people"] == store["max_capacity"])
-        is_queuing = db.stores.find_one(
-            {"name": store_name,
-             "queuing_people": {"$elemMatch": {"user_id": user_id}}})
-        store_information = {
-            "目前人數": store['current_people'],
-            "最大人數": store['max_capacity'],
-            "剩餘座位": store['max_capacity'] - store['current_people'],
-        }
+        is_queuing = db.stores.find_one({"name": store_name,
+                                         "queuing_people.user_id": user_id},
+                                        {"queuing_people.$": True}
+                                        )
         if is_full:
             if is_queuing:
-                return TextMessage(text=str(store))
+                text_information = {
+                    "目前排隊編號": store["last_num"],
+                    "您的編號": is_queuing["queuing_people"][0]["num"],
+                }
+                return TemplateSendMessage(
+                    alt_text="is_full and is_queuing",
+                    template=ButtonsTemplate(
+                        title=store_name,
+                        text="\n".join(
+                            [f"{k}： {v}" for k, v in text_information.items()]),
+                        actions=[
+                            {
+                                "type": "uri",
+                                "label": "地圖",
+                                "uri": "https://google.com"
+                            },
+                        ]
+                    )
+                )
             else:  # not is_queuing
-                return TextSendMessage(
-                    text=(str(store) +
-                          "\n\nThe store is full now, do you want to queuing?")
+                return TemplateSendMessage(
+                    alt_text="is_full and not is_queuing",
+                    template=ButtonsTemplate(
+                        title=store_name,
+                        text=f"目前已滿\n排隊人數：{len(store['queuing_people'])}",
+                        actions=[
+                            {
+                                "type": "uri",
+                                "label": "地圖",
+                                "uri": "https://google.com"
+                            },
+                            MessageTemplateAction(
+                                label="我要排隊",
+                                text=f"我要排隊：{store['name']}",
+                            ),
+                        ]
+                    )
                 )
         else:  # not is_full
+            store_information = {
+                "目前人數": store['current_people'],
+                "最大人數": store['max_capacity'],
+                "剩餘座位": store['max_capacity'] - store['current_people'],
+            }
             return TemplateSendMessage(
-                alt_text="Buttons template",
+                alt_text="not is_full",
                 template=ButtonsTemplate(
                     title=store_name,
                     text="\n".join(
-                        [f"{k}: {v}" for k, v in store_information.items()]
+                        [f"{k}： {v}" for k, v in store_information.items()]
                     ),
                     actions=[
                         {

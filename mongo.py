@@ -32,4 +32,5 @@ with open("./data/stores.json") as fin:
     for store in stores:
         store["current_people"] = 0
         store["queuing_people"] = []
+        store["last_num"] = 0
     db.stores.insert_many(stores)
