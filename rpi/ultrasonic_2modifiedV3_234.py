@@ -17,6 +17,17 @@ import time
 import RPi.GPIO as GPIO
 
 # -----------------------
+# Define some variables
+# -----------------------
+
+SERVER_HOST = os.getenv('SERVER_HOST', None)
+
+if SERVER_HOST is None:
+    print('Please specify SERVER_HOST ' +
+          'as environment variables.')
+    exit()
+
+# -----------------------
 # Define some functions
 # -----------------------
 
@@ -74,7 +85,7 @@ GPIO_ECHO1    = 22
 GPIO_TRIGGER2 = 10
 GPIO_ECHO2    = 9
 
-print ("Ultrasonic Measurement")
+#print ("Ultrasonic Measurement")
 # Set pins as output and input
 GPIO.setup(GPIO_TRIGGER1,GPIO.OUT)  # Trigger
 GPIO.setup(GPIO_ECHO1,GPIO.IN)      # Echo
@@ -105,6 +116,7 @@ try:
                   #print("Distance1 : ", distance1)
                   if distance1 < 100 or distance1 > 250:
                       people = people + 1
+                      update_current_people(SERVER_HOST, "合益佳雞肉飯","2-secret", people)
                       break
                   if zz==4:
                       state = 1
@@ -112,13 +124,14 @@ try:
               if state==1:
                   state=0
                   people-=1
+                  update_current_people(SERVER_HOST, "合益佳雞肉飯","2-secret", people)
                   time.sleep(0.3)
                   break
               else:
                   time.sleep(0.3)
                   break
           
-      print("people : ", people)
+      # print("people : ", people)
       time.sleep(0.3)
 
 except KeyboardInterrupt:
