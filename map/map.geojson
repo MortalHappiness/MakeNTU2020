@@ -1,0 +1,89 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+          "id":1,
+          "name":"阿玉水餃"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          25.021703,
+          121.542691
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+          "id":2,
+          "name":"二八麵堂"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          25.022010, 
+          121.542892
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+          "id":3,
+          "name":"合益佳雞肉飯"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          25.022126, 
+          121.542512
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+          "id":4,
+          "name":"搗飛豆花"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          25.022905, 
+          121.542904
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+          "id":5,
+          "name":"邦食堂"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          25.022949, 
+          121.542615
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+          "id":6,
+          "name":"滇味小廚"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          25.022831, 
+          121.542760
+        ]
+      }
+    }
+  ]
+}
