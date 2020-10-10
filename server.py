@@ -1,7 +1,9 @@
 import os
+from io import BytesIO
 
+import qrcode
 from dotenv import load_dotenv
-from flask import Flask, request, abort
+from flask import Flask, request, abort, send_file
 from pymongo import MongoClient
 
 from linebot import LineBotApi, WebhookHandler
@@ -122,6 +124,17 @@ def api_current_people():
     db.stores.update_one({"name": store_name}, {
                          "$set": {"current_people": current_people}})
     return "", 200
+
+
+@app.route("/api/qrcode/<user_id>", methods=["GET"])
+def api_qrcode(user_id):
+    if len(user_id) > 50:
+        abort(400)
+    pil_img = qrcode.make(user_id)
+    img_io = BytesIO()
+    pil_img.save(img_io, 'JPEG', quality=70)
+    img_io.seek(0)
+    return send_file(img_io, mimetype='image/jpeg')
 
 # ========================================
 

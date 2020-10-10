@@ -11,10 +11,13 @@ Jinja2==2.11.2
 line-bot-sdk==1.17.0
 MarkupSafe==1.1.1
 msgpack==1.0.0
+Pillow==7.2.0
 pycodestyle==2.6.0
 pymongo==3.11.0
 python-dotenv==0.14.0
+qrcode==6.1
 requests==2.24.0
+six==1.15.0
 toml==0.10.1
 urllib3==1.25.10
 Werkzeug==1.0.1
