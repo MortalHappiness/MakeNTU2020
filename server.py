@@ -10,6 +10,7 @@ from linebot.models import (
     MessageEvent,
     TextMessage,
     TextSendMessage,
+    ImageSendMessage,
     TemplateSendMessage,
     ButtonsTemplate,
     MessageTemplateAction,
@@ -234,8 +235,7 @@ def get_reply(user_id, text):
             return TextSendMessage(text="該店尚有空位，不需排隊")
         if is_queuing is not None:
             queue_num = is_queuing["queuing_people"][0]["num"]
-            image = qrcode.make(user_id)
-            return (TextSendMessage(text=f"你已經正在排隊了！你的編號是{queue_num}號"),ImageSendMessage(image))
+            return TextSendMessage(text=f"你已經正在排隊了！你的編號是{queue_num}號")
         try:
             max_num = store["queuing_people"][-1]["num"]
         except IndexError:
@@ -244,7 +244,7 @@ def get_reply(user_id, text):
                              {"$push": {"queuing_people": {
                                  "user_id": user_id, "num": max_num + 1}}}
                              )
-        return TextSendMessage(text=f"排隊成功！你的編號是{max_num + 1}號")
+        return [TextSendMessage(text=f"排隊成功！你的編號是{max_num + 1}號"),ImageSendMessage(image)]
 
     if text.startswith("取消排隊:") or text.startswith("取消排隊："):
         if len(text) == 5:
