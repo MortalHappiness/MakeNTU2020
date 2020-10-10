@@ -5,7 +5,8 @@
     "secret_key": "微笑廚房-secret",
     "latitude": 25.022005,
     "longitude": 121.542518,
-    "max_capacity": 30
+    "max_capacity": 30,
+    "fanpage": "https://www.facebook.com/smileadam11"
   },
   {
     "name": "邦食堂",
@@ -13,7 +14,8 @@
     "secret_key": "邦食堂-secret",
     "latitude": 25.022959,
     "longitude": 121.542617,
-    "max_capacity": 1
+    "max_capacity": 1,
+    "fanpage": "https://www.facebook.com/banfoodplace/"
   },
   {
     "name": "合益佳雞肉飯",
@@ -21,7 +23,8 @@
     "secret_key": "合益佳-secret",
     "latitude": 25.022140,
     "longitude": 121.542513,
-    "max_capacity": 25
+    "max_capacity": 25,
+    "fanpage": "https://www.facebook.com/ntueater/posts/703330173174981/"
   },
   {
     "name": "大李水餃",
@@ -29,7 +32,8 @@
     "secret_key": "大李-secret",
     "latitude": 25.022069,
     "longitude": 121.541364,
-    "max_capacity": 50
+    "max_capacity": 50,
+    "fanpage": "https://www.facebook.com/pages/%E5%A4%A7%E6%9D%8E%E6%B0%B4%E9%A4%83/177588238954445/"
   },
   {
     "name": "五九麵館",
@@ -37,6 +41,7 @@
     "secret_key": "五九-secret",
     "latitude": 25.022478,
     "longitude": 121.542899,
-    "max_capacity": 20
+    "max_capacity": 20,
+    "fanpage": "https://www.facebook.com/%E4%BA%94%E4%B9%9D%E9%BA%B5%E9%A4%A8-860910354254432"
   }
 ]

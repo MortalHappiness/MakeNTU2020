@@ -19,6 +19,9 @@ from linebot.models import (
     CarouselColumn,
     URITemplateAction,
     MessageTemplateAction,
+    QuickReply,
+    QuickReplyButton,
+    MessageAction
 )
 import qrcode
 
@@ -184,7 +187,6 @@ def api_map():
 def api_map_path(path):
     return send_from_directory('map', path)
 
-
 # ========================================
 
 
@@ -197,6 +199,26 @@ def handle_message(event):
 
 # ========================================
 
+QuickReply_text_message = TextSendMessage(
+    text = HELP_MESSAGE,
+        quick_reply = QuickReply(
+            items = [ 
+                QuickReplyButton(
+                    action = MessageAction(label = "#邦食堂", text = "#邦食堂"), 
+                ), 
+                QuickReplyButton( 
+                      action = MessageAction(label = "#微笑廚房", text = "#微笑廚房"), 
+                ), 
+                QuickReplyButton( 
+                    action = MessageAction(label = "#五九麵館", text = "#五九麵館"), 
+                ), 
+                QuickReplyButton( 
+                    action = MessageAction(label = "#大李水餃", text = "#大李水餃"), 
+                ),
+                QuickReplyButton( 
+                    action = MessageAction(label = "#合益佳雞肉飯", text = "#合益佳雞肉飯"), 
+                )
+            ] ) ) 
 
 def get_reply(user_id, text):
     """
@@ -205,7 +227,7 @@ def get_reply(user_id, text):
     text = text.strip()
 
     if text in ["#", "help"]:
-        return TextSendMessage(text=HELP_MESSAGE)
+        return QuickReply_text_message
 
     if text.startswith("#"):
         store_name = text[1:]
@@ -239,6 +261,11 @@ def get_reply(user_id, text):
                                 "label": "地圖",
                                 "uri": SERVER_HOST + "/api/map"
                             },
+                            {
+                                "type": "uri",
+                                "label": "Facebook",
+                                "uri": store["fanpage"]
+                            },
                             MessageTemplateAction(
                                 label="取消排隊",
                                 text=f"取消排隊：{store['name']}",
@@ -260,6 +287,11 @@ def get_reply(user_id, text):
                                 "type": "uri",
                                 "label": "地圖",
                                 "uri": SERVER_HOST + "/api/map"
+                            },
+                            {
+                                "type": "uri",
+                                "label": "Facebook",
+                                "uri": store["fanpage"]
                             },
                             MessageTemplateAction(
                                 label="我要排隊",
@@ -289,6 +321,11 @@ def get_reply(user_id, text):
                             "type": "uri",
                             "label": "地圖",
                             "uri": SERVER_HOST + "/api/map"
+                        },
+                        {
+                            "type": "uri",
+                            "label": "Facebook",
+                            "uri": store["fanpage"]
                         },
                     ]
                 )
@@ -381,7 +418,12 @@ def get_reply(user_id, text):
                         "type": "uri",
                         "label": "地圖",
                         "uri": SERVER_HOST + "/api/map"
-                    }
+                    },
+                    {
+                        "type": "uri",
+                        "label": "Facebook",
+                        "uri": "https://www.facebook.com/smileadam11"
+                    },
                 ]
             ),
             CarouselColumn(
@@ -394,7 +436,12 @@ def get_reply(user_id, text):
                         "type": "uri",
                         "label": "地圖",
                         "uri": SERVER_HOST + "/api/map"
-                    }
+                    },
+                    {
+                        "type": "uri",
+                        "label": "Facebook",
+                        "uri": "https://www.facebook.com/pages/%E5%A4%A7%E6%9D%8E%E6%B0%B4%E9%A4%83/177588238954445/"
+                    },
                 ]
             ),
             CarouselColumn(
@@ -407,7 +454,12 @@ def get_reply(user_id, text):
                         "type": "uri",
                         "label": "地圖",
                         "uri": SERVER_HOST + "/api/map"
-                    }
+                    },
+                    {
+                        "type": "uri",
+                        "label": "Facebook",
+                        "uri": "https://www.facebook.com/%E4%BA%94%E4%B9%9D%E9%BA%B5%E9%A4%A8-860910354254432"
+                    },
                 ]
             ),
             CarouselColumn(
@@ -420,7 +472,12 @@ def get_reply(user_id, text):
                         "type": "uri",
                         "label": "地圖",
                         "uri": SERVER_HOST + "/api/map"
-                    }
+                    },
+                    {
+                        "type": "uri",
+                        "label": "Facebook",
+                        "uri": "https://www.facebook.com/ntueater/posts/703330173174981/"
+                    },
                 ]
             ),
             CarouselColumn(
@@ -433,7 +490,12 @@ def get_reply(user_id, text):
                         "type": "uri",
                         "label": "地圖",
                         "uri": SERVER_HOST + "/api/map"
-                    }
+                    },
+                    {
+                        "type": "uri",
+                        "label": "Facebook",
+                        "uri": "https://www.facebook.com/banfoodplace/"
+                    },
                 ]
             )
         ]
@@ -441,7 +503,7 @@ def get_reply(user_id, text):
         )
 
 
-    return TextSendMessage(text=HELP_MESSAGE)
+    return QuickReply_text_message
 
 # ========================================
 
