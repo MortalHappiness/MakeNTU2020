@@ -30,6 +30,12 @@ Reset database
 python mongo.py
 ```
 
+Enable richmenu
+
+```
+python richmenu.py
+```
+
 Start server
 
 ```

@@ -40,7 +40,9 @@ line_bot_api = LineBotApi(LINE_CHANNEL_ACCESS_TOKEN)
 with open("images/bottom_menu.png", 'rb') as f:
     line_bot_api.set_rich_menu_image(richmenu_id, "image/jpeg", f)
 
-req = requests.request('POST', 'https://api.line.me/v2/bot/user/all/richmenu/'+richmenu_id, 
-                       headers=headers)
+res = requests.request('POST', 'https://api.line.me/v2/bot/user/all/richmenu/' +
+                       richmenu_id, headers=headers)
 
-print(req.text)
+if not res.ok:
+    print(res.text)
+    exit()
