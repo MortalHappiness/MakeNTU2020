@@ -483,7 +483,7 @@ def get_reply(user_id, text):
                         thumbnail_image_url=SERVER_HOST +
                         "/images/" + store["image"],
                         image_aspect_ratio="square",
-                        text="目前已滿\n目前排隊編號："+store["last_num"],
+                        text="目前已滿\n目前排隊編號："+str(store["last_num"]),
                         actions=[
                             {
                                 "type": "uri",
