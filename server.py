@@ -377,10 +377,11 @@ def get_reply(user_id, text):
                 title='微笑廚房',
                 text='106台北市大安區和平東路二段118巷54弄3號',
                 actions=[
-                    URITemplateAction(
-                        label='地圖',
-                        uri='http://google.com'
-                    )
+                    {
+                        "type": "uri",
+                        "label": "地圖",
+                        "uri": SERVER_HOST + "/api/map"
+                    }
                 ]
             ),
             CarouselColumn(
@@ -389,10 +390,11 @@ def get_reply(user_id, text):
                 title='大李水餃',
                 text='106台北市大安區和平東路二段118巷54弄35號',
                 actions=[
-                    URITemplateAction(
-                        label='地圖',
-                        uri='http://google.com'
-                    )
+                    {
+                        "type": "uri",
+                        "label": "地圖",
+                        "uri": SERVER_HOST + "/api/map"
+                    }
                 ]
             ),
             CarouselColumn(
@@ -401,10 +403,11 @@ def get_reply(user_id, text):
                 title='五九麵館',
                 text='106台北市大安區和平東路二段118巷57-1號',
                 actions=[
-                    URITemplateAction(
-                        label='地圖',
-                        uri='http://google.com'
-                    )
+                    {
+                        "type": "uri",
+                        "label": "地圖",
+                        "uri": SERVER_HOST + "/api/map"
+                    }
                 ]
             ),
             CarouselColumn(
@@ -413,10 +416,11 @@ def get_reply(user_id, text):
                 title='合益佳雞肉飯',
                 text='106台北市大安區和平東路二段118巷54弄7號',
                 actions=[
-                    URITemplateAction(
-                        label='地圖',
-                        uri='http://google.com'
-                    )
+                    {
+                        "type": "uri",
+                        "label": "地圖",
+                        "uri": SERVER_HOST + "/api/map"
+                    }
                 ]
             ),
             CarouselColumn(
@@ -425,10 +429,11 @@ def get_reply(user_id, text):
                 title='邦食堂',
                 text='106台北市大安區和平東路二段96巷17弄28號',
                 actions=[
-                    URITemplateAction(
-                        label='地圖',
-                        uri='http://google.com'
-                    )
+                    {
+                        "type": "uri",
+                        "label": "地圖",
+                        "uri": SERVER_HOST + "/api/map"
+                    }
                 ]
             )
         ]
