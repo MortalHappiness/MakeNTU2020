@@ -38,13 +38,5 @@
     "latitude": 25.022478,
     "longitude": 121.542899,
     "max_capacity": 20
-  },
-  {
-    "name": "I'm Pasta",
-    "image":"impasta.jpg",
-    "secret_key": "pasta-secret",
-    "latitude": 25.022508,
-    "longitude": 121.542796,
-    "max_capacity": 40
   }
 ]
