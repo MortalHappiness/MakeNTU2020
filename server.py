@@ -193,6 +193,7 @@ def get_reply(user_id, text):
                         title=store_name,
                         thumbnail_image_url=SERVER_HOST +
                         "/images/" + store["image"],
+                        image_aspect_ratio="square",
                         text="\n".join(
                             [f"{k}： {v}" for k, v in text_information.items()]),
                         actions=[
@@ -215,6 +216,7 @@ def get_reply(user_id, text):
                         title=store_name,
                         thumbnail_image_url=SERVER_HOST +
                         "/images/" + store["image"],
+                        image_aspect_ratio="square",
                         text=f"目前已滿\n排隊人數：{len(store['queuing_people'])}",
                         actions=[
                             {
@@ -241,6 +243,7 @@ def get_reply(user_id, text):
                     title=store_name,
                     thumbnail_image_url=SERVER_HOST +
                     "/images/" + store["image"],
+                    image_aspect_ratio="square",
                     text="\n".join(
                         [f"{k}： {v}" for k, v in store_information.items()]
                     ),
