@@ -153,7 +153,7 @@ def api_max_capacity():
     store = db.stores.find_one({"name": store_name})
     return str(store["max_capacity"])
 
-@app.route("/api/last_num")
+@app.route("/api/last-num")
 def api_last_num():
     store_name = request.args.get("name", None)
     if store_name is None:
