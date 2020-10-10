@@ -241,6 +241,10 @@ def api_session():
     if result is None:
         return render_template("login.html", msg="Invalid username or password")
     session["username"] = username
+    if "url" in session:
+        url = session["url"]
+        session["url"] = None
+        return redirect(url)
     return "Login successfully!", 200
 
 
@@ -248,6 +252,7 @@ def api_session():
 def api_pop_user():
     store_name = session.get("username", None)
     if store_name is None:
+        session["url"] = request.full_path
         return redirect("/login")
     user_id = request.args.get("userid", None)
     is_queuing = db.stores.find_one({"name": store_name,
