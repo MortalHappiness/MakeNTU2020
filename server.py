@@ -86,7 +86,7 @@ def index():
 
 
 @app.route('/images/<path:path>')
-def send_js(path):
+def send_image(path):
     return send_from_directory('images', path)
 
 
@@ -169,6 +169,17 @@ def api_stores():
         ]
     )
     return str(list(result))
+
+
+@app.route("/api/map/", methods=["GET"])
+def api_map():
+    return send_from_directory('map', "index.html")
+
+
+@app.route("/api/map/<path:path>", methods=["GET"])
+def api_map_path(path):
+    return send_from_directory('map', path)
+
 
 # ========================================
 
