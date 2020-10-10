@@ -3,7 +3,7 @@ from io import BytesIO
 
 import qrcode
 from dotenv import load_dotenv
-from flask import Flask, request, abort, send_file
+from flask import Flask, request, abort, send_file, send_from_directory
 from pymongo import MongoClient
 
 from linebot import LineBotApi, WebhookHandler
@@ -81,6 +81,11 @@ HELP_MESSAGE = """指令教學：
 @app.route("/")
 def index():
     return "Hi"
+
+
+@app.route('/images/<path:path>')
+def send_js(path):
+    return send_from_directory('images', path)
 
 
 @app.route("/callback", methods=['POST'])
