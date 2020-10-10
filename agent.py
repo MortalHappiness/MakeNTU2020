@@ -25,3 +25,4 @@ def get_last_num(url, store_name):
 
 if __name__ == '__main__':
     print(get_max_capacity("http://localhost:8000", "邦食堂"))
+    print(get_last_num("http://localhost:8000", "邦食堂"))
