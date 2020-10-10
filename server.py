@@ -186,6 +186,7 @@ def get_reply(user_id, text):
                     alt_text="is_full and is_queuing",
                     template=ButtonsTemplate(
                         title=store_name,
+                        thumbnailImageUrl=store["image"],
                         text="\n".join(
                             [f"{k}： {v}" for k, v in text_information.items()]),
                         actions=[
