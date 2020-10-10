@@ -73,7 +73,7 @@ HELP_MESSAGE = """指令教學：
 「取消排隊：邦食堂」
 
 也可以從螢幕下方的選單顯示地圖與教學～
-祝您使用愉快 """  
+祝您使用愉快 """
 
 # ========================================
 
@@ -146,7 +146,7 @@ def api_qrcode(user_id):
 # ========================================
 
 
-@ handler.add(MessageEvent, message=TextMessage)
+@handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
     # Decide what Component to return to Channel
     reply = get_reply(event.source.user_id, event.message.text)
@@ -194,6 +194,10 @@ def get_reply(user_id, text):
                                 "label": "地圖",
                                 "uri": "https://google.com"
                             },
+                            MessageTemplateAction(
+                                label="取消排隊",
+                                text=f"取消排隊：{store['name']}",
+                            ),
                         ]
                     )
                 )
@@ -265,8 +269,19 @@ def get_reply(user_id, text):
                                  "user_id": user_id, "num": max_num + 1}}}
                              )
         qrcode_url = SERVER_HOST + "/api/qrcode/" + user_id
-        return [TextSendMessage(text=f"排隊成功！你的編號是{max_num + 1}號"),ImageSendMessage(original_content_url=qrcode_url, preview_image_url=qrcode_url),TextSendMessage(text=f"入店時請出示上面的QRcode")]
-
+        return [TextSendMessage(text=f"排隊成功！你的編號是{max_num + 1}號"),
+                ImageSendMessage(original_content_url=qrcode_url,
+                                 preview_image_url=qrcode_url),
+                TemplateSendMessage(
+                    alt_text="queuing success message",
+                    template=ButtonsTemplate(
+                        text=f"入店時請出示上面的QRcode",
+                        actions=[
+                            MessageTemplateAction(
+                                label="取消排隊",
+                                text=f"取消排隊：{store['name']}",
+                            ),
+                        ]))]
     if text.startswith("取消排隊:") or text.startswith("取消排隊："):
         if len(text) == 5:
             return TextSendMessage(text="請輸入要取消排隊的店名！")
