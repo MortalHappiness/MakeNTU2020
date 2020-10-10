@@ -2,7 +2,7 @@ body {
   background:url('http://cdn.wallpapersafari.com/13/6/Mpsg2b.jpg');
   margin:0px;
   font-family: 'Ubuntu', sans-serif;
-	background-size: 100% 110%;
+  background-size: 100% 110%;
 }
 h1, h2, h3, h4, h5, h6, a {
   margin:0; padding:0;
@@ -33,14 +33,14 @@ h1, h2, h3, h4, h5, h6, a {
 .login-form {
   box-sizing:border-box;
   padding-top:15px;
-	padding-bottom:10%;
+  padding-bottom:10%;
   margin:5% auto;
   text-align:center;
 }
 .login input[type="text"],
 .login input[type="password"] {
   max-width:400px;
-	width: 80%;
+  width: 80%;
   line-height:3em;
   font-family: 'Ubuntu', sans-serif;
   margin:1em 2em;
@@ -78,7 +78,7 @@ h1, h2, h3, h4, h5, h6, a {
   cursor:pointer;
 }
 
-/*Media Querie*/
+[>Media Querie<]
 @media only screen and (min-width : 150px) and (max-width : 530px){
   .login-form h3 {
     text-align:center;
