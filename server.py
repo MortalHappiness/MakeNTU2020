@@ -283,6 +283,25 @@ QuickReply_text_message_nostore_cancel = TextSendMessage(
                 )
             ] ) ) 
 
+Confirm_template = TemplateSendMessage(
+        alt_text='目錄 template',
+        template=ConfirmTemplate(
+            title='確定取消？',
+            text='確定要取消排隊？',
+            actions=[                              
+                MessageTemplateAction(
+                    label='Yes',
+                    text='Yes'
+                ),
+                MessageTemplateAction(
+                    label='No',
+                    text='No'
+                )
+            ])
+          )
+
+# ========================================
+
 def get_reply(user_id, text):
     """
     Given text, return reply text
