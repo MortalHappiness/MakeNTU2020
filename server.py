@@ -15,6 +15,9 @@ from linebot.models import (
     ImageSendMessage,
     TemplateSendMessage,
     ButtonsTemplate,
+    CarouselTemplate,
+    CarouselColumn,
+    URITemplateAction,
     MessageTemplateAction,
 )
 import qrcode
@@ -349,6 +352,77 @@ def get_reply(user_id, text):
                 TextSendMessage(
                     text=f"{store['name']}的排隊快輪到您了，請留意排隊進度"))
         return TextSendMessage(text="取消排隊成功！")
+
+      
+    if text == "List":
+        return TemplateSendMessage(
+        alt_text='Carousel template',
+        template=CarouselTemplate(
+        columns=[
+            CarouselColumn(
+                thumbnail_image_url=SERVER_HOST +
+                    "/images/" + "smile.jpeg",
+                title='微笑廚房',
+                text='106台北市大安區和平東路二段118巷54弄3號',
+                actions=[
+                    URITemplateAction(
+                        label='地圖',
+                        uri='http://google.com'
+                    )
+                ]
+            ),
+            CarouselColumn(
+                thumbnail_image_url=SERVER_HOST +
+                    "/images/" + "大李.jpeg",
+                title='大李水餃',
+                text='106台北市大安區和平東路二段118巷54弄35號',
+                actions=[
+                    URITemplateAction(
+                        label='地圖',
+                        uri='http://google.com'
+                    )
+                ]
+            ),
+            CarouselColumn(
+                thumbnail_image_url=SERVER_HOST +
+                    "/images/" + "五九.jpg",
+                title='五九麵館',
+                text='106台北市大安區和平東路二段118巷57-1號',
+                actions=[
+                    URITemplateAction(
+                        label='地圖',
+                        uri='http://google.com'
+                    )
+                ]
+            ),
+            CarouselColumn(
+                thumbnail_image_url=SERVER_HOST +
+                    "/images/" + "合益佳.jpg",
+                title='合益佳雞肉飯',
+                text='106台北市大安區和平東路二段118巷54弄7號',
+                actions=[
+                    URITemplateAction(
+                        label='地圖',
+                        uri='http://google.com'
+                    )
+                ]
+            ),
+            CarouselColumn(
+                thumbnail_image_url=SERVER_HOST +
+                    "/images/" + "banshokudou.png",
+                title='邦食堂',
+                text='106台北市大安區和平東路二段96巷17弄28號',
+                actions=[
+                    URITemplateAction(
+                        label='地圖',
+                        uri='http://google.com'
+                    )
+                ]
+            )
+        ]
+        )
+        )
+
 
     return TextSendMessage(text=HELP_MESSAGE)
 
