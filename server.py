@@ -337,7 +337,7 @@ def get_reply(user_id, text):
         store_name = text[5:].strip()
         store = db.stores.find_one({"name": store_name})
         if store is None:
-            return TextSendMessage(text=f'抱歉，查無此店')
+            return (TextSendMessage(text=f'抱歉，查無此店'),QuickReply_text_message)
         is_full = (store["current_people"] == store["max_capacity"])
         is_queuing = db.stores.find_one({"name": store_name,
                                          "queuing_people.user_id": user_id},
@@ -395,7 +395,7 @@ def get_reply(user_id, text):
                               "queuing_people.user_id": user_id},
                              {"$pull": {"queuing_people": {"user_id": user_id}}}
                              )
-        if queuing_index in [0, 1]:
+        if queuing_index in [0, 1] and len(store["queuing_people"])>2:
             line_bot_api.push_message(
                 store["queuing_people"][QUEUE_SEND_MESSAGE_NUM]["user_id"],
                 TextSendMessage(
