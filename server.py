@@ -265,7 +265,7 @@ def get_reply(user_id, text):
                                  "user_id": user_id, "num": max_num + 1}}}
                              )
         qrcode_url = SERVER_HOST + "/api/qrcode/" + user_id
-        return [TextSendMessage(text=f"排隊成功！你的編號是{max_num + 1}號"),ImageSendMessage(original_content_url=qrcode_url, preview_image_url=qrcode_url)]
+        return [TextSendMessage(text=f"排隊成功！你的編號是{max_num + 1}號"),ImageSendMessage(original_content_url=qrcode_url, preview_image_url=qrcode_url),TextSendMessage(text=f"入店時請出示上面的QRcode")]
 
     if text.startswith("取消排隊:") or text.startswith("取消排隊："):
         if len(text) == 5:
