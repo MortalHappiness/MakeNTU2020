@@ -246,6 +246,25 @@ def get_reply(user_id, text):
                              )
         return TextSendMessage(text=f"排隊成功！你的編號是{max_num + 1}號")
 
+    if text.startswith("取消排隊:") or text.startswith("取消排隊："):
+        if len(text) == 5:
+            return TextSendMessage(text="請輸入要取消排隊的店名！")
+        store_name = text[5:].strip()
+        store = db.stores.find_one({"name": store_name})
+        if store is None:
+            return TextSendMessage(text=f'抱歉，查無此店')
+        is_queuing = db.stores.find_one({"name": store_name,
+                                         "queuing_people.user_id": user_id},
+                                        {"queuing_people.$": True}
+                                        )
+        if is_queuing is None:
+            return TextSendMessage(text=f"您沒有在排隊，故無法取消排隊")
+        db.stores.update_one({"name": store_name,
+                              "queuing_people.user_id": user_id},
+                             {"$pull": {"queuing_people": {"user_id": user_id}}}
+                             )
+        return TextSendMessage(text="取消排隊成功！")
+
     return TextSendMessage(text=HELP_MESSAGE)
 
 # ========================================
