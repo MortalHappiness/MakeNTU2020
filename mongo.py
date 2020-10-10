@@ -19,7 +19,7 @@ if MONGO_HOST is None or MONGO_DB_NAME is None:
 
 # ========================================
 
-client = MongoClient(MONGO_HOST, 27017)
+client = MongoClient(MONGO_HOST)
 
 # Reset database
 client.drop_database(MONGO_DB_NAME)

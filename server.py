@@ -38,7 +38,7 @@ app = Flask(__name__)
 line_bot_api = LineBotApi(LINE_CHANNEL_ACCESS_TOKEN)
 handler = WebhookHandler(LINE_CHANNEL_SECRET)
 
-mongo_client = MongoClient(MONGO_HOST, 27017)
+mongo_client = MongoClient(MONGO_HOST)
 db = mongo_client[MONGO_DB_NAME]
 
 # ========================================
