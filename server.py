@@ -125,10 +125,8 @@ def api_current_people():
 @ handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
     # Decide what Component to return to Channel
-    reply_text = get_reply(event.source.user_id, event.message.text)
-    line_bot_api.reply_message(
-        event.reply_token,
-        TextSendMessage(text=reply_text))
+    reply = get_reply(event.source.user_id, event.message.text)
+    line_bot_api.reply_message(event.reply_token, reply)
 
 
 
@@ -142,27 +140,78 @@ def get_reply(user_id, text):
     text = text.strip()
 
     if text in ["#", "help"]:
-        return HELP_MESSAGE
+        return TextSendMessage(text=HELP_MESSAGE)
 
     if text.startswith("#"):
         store_name = text[1:]
         store = db.stores.find_one({"name": store_name})
         if store is None:
-            return f'Sorry, store "{store_name}" is not in our database!'
+            return TextSendMessage(text=f'抱歉，查無此店')
         assert 0 <= store["current_people"] <= store["max_capacity"]
         is_full = (store["current_people"] == store["max_capacity"])
         is_queuing = db.stores.find_one(
-            {"name": store_name, "queuing_people": [user_id]})
+            {"name": store_name,
+             "queuing_people": {"$elemMatch": {"user_id": user_id}}})
+        store_information = {
+            "目前人數": store['current_people'],
+            "最大人數": store['max_capacity'],
+            "剩餘座位": store['max_capacity'] - store['current_people'],
+        }
         if is_full:
             if is_queuing:
-                return str(store)
+                return TextMessage(text=str(store))
             else:  # not is_queuing
-                return (str(store) +
-                        "\n\nThe store is full now, do you want to queuing?")
+                return TextSendMessage(
+                    text=(str(store) +
+                          "\n\nThe store is full now, do you want to queuing?")
+                )
         else:  # not is_full
-            return str(store)
+            return TemplateSendMessage(
+                alt_text="Buttons template",
+                template=ButtonsTemplate(
+                    title=store_name,
+                    text="\n".join(
+                        [f"{k}: {v}" for k, v in store_information.items()]
+                    ),
+                    actions=[
+                        {
+                            "type": "uri",
+                            "label": "地圖",
+                            "uri": "https://google.com"
+                        },
+                    ]
+                )
+            )
 
-    return HELP_MESSAGE
+    if text.startswith("我要排隊:") or text.startswith("我要排隊："):
+        if len(text) == 5:
+            return TextSendMessage(text="請輸入要排隊的店名！")
+        store_name = text[5:].strip()
+        store = db.stores.find_one({"name": store_name})
+        if store is None:
+            return TextSendMessage(text=f'抱歉，查無此店')
+        is_full = (store["current_people"] == store["max_capacity"])
+        is_queuing = db.stores.find_one({"name": store_name,
+                                         "queuing_people.user_id": user_id},
+                                        {"queuing_people.$": True}
+                                        )
+        if not is_full:
+            return TextSendMessage(text="該店尚有空位，不需排隊")
+        if is_queuing is not None:
+            queue_num = is_queuing["queuing_people"][0]["num"]
+            return TextSendMessage(
+                text=f"你已經正在排隊了！你的編號是{queue_num}號")
+        try:
+            max_num = store["queuing_people"][-1]["num"]
+        except IndexError:
+            max_num = 0
+        db.stores.update_one({"name": store_name},
+                             {"$push": {"queuing_people": {
+                                 "user_id": user_id, "num": max_num + 1}}}
+                             )
+        return TextSendMessage(text=f"排隊成功！你的編號是{max_num + 1}號")
+
+    return TextSendMessage(text=HELP_MESSAGE)
 
 # ========================================
 
