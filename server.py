@@ -41,6 +41,13 @@ if MONGO_HOST is None or MONGO_DB_NAME is None:
           'as environment variables.')
     exit()
 
+SERVER_HOST = os.getenv("SERVER_HOST", None)
+
+if SERVER_HOST is None:
+    print('Please specify SERVER_HOST ' +
+          'as environment variables.')
+    exit()
+
 # ========================================
 
 
@@ -257,7 +264,8 @@ def get_reply(user_id, text):
                              {"$push": {"queuing_people": {
                                  "user_id": user_id, "num": max_num + 1}}}
                              )
-        return [TextSendMessage(text=f"排隊成功！你的編號是{max_num + 1}號"),ImageSendMessage(image)]
+        qrcode_url = SERVER_HOST + "/api/qrcode/" + user_id
+        return [TextSendMessage(text=f"排隊成功！你的編號是{max_num + 1}號"),ImageSendMessage(original_content_url=qrcode_url, preview_image_url=qrcode_url)]
 
     if text.startswith("取消排隊:") or text.startswith("取消排隊："):
         if len(text) == 5:
