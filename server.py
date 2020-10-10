@@ -472,35 +472,66 @@ def get_reply(user_id, text):
                     )
                 )
         else:  # not is_full
-            store_information = {
-                "目前人數": store['current_people'],
-                "最大人數": store['max_capacity'],
-                "剩餘座位": store['max_capacity'] - store['current_people'],
-            }
-            return TemplateSendMessage(
-                alt_text="not is_full",
-                template=ButtonsTemplate(
-                    title=store_name,
-                    thumbnail_image_url=SERVER_HOST +
-                    "/images/" + store["image"],
-                    image_aspect_ratio="square",
-                    text="\n".join(
-                        [f"{k}： {v}" for k, v in store_information.items()]
-                    ),
-                    actions=[
-                        {
-                            "type": "uri",
-                            "label": "地圖",
-                            "uri": SERVER_HOST + "/api/map"
-                        },
-                        {
-                            "type": "uri",
-                            "label": "Facebook",
-                            "uri": store["fanpage"]
-                        },
-                    ]
+            if len(store["queuing_people"])>0:
+                text_information = {
+                    "目前排隊編號": store["last_num"],
+                }
+                return TemplateSendMessage(
+                    alt_text="not is_full_queuing",
+                    template=ButtonsTemplate(
+                        title=store_name,
+                        thumbnail_image_url=SERVER_HOST +
+                        "/images/" + store["image"],
+                        image_aspect_ratio="square",
+                        text="目前已滿\n目前排隊編號："+store["last_num"],
+                        actions=[
+                            {
+                                "type": "uri",
+                                "label": "地圖",
+                                "uri": SERVER_HOST + "/api/map"
+                            },
+                            {
+                                "type": "uri",
+                                "label": "Facebook",
+                                "uri": store["fanpage"]
+                            },
+                            MessageTemplateAction(
+                                label="我要排隊",
+                                text=f"我要排隊：{store['name']}",
+                            ),
+                        ]
+                    )
                 )
-            )
+            else:
+                store_information = {
+                    "目前人數": store['current_people'],
+                    "最大人數": store['max_capacity'],
+                    "剩餘座位": store['max_capacity'] - store['current_people'],
+                }
+                return TemplateSendMessage(
+                    alt_text="not is_full",
+                    template=ButtonsTemplate(
+                        title=store_name,
+                        thumbnail_image_url=SERVER_HOST +
+                        "/images/" + store["image"],
+                        image_aspect_ratio="square",
+                        text="\n".join(
+                            [f"{k}： {v}" for k, v in store_information.items()]
+                        ),
+                        actions=[
+                            {
+                                "type": "uri",
+                                "label": "地圖",
+                                "uri": SERVER_HOST + "/api/map"
+                            },
+                            {
+                                "type": "uri",
+                                "label": "Facebook",
+                                "uri": store["fanpage"]
+                            },
+                        ]
+                    )
+                )
 
     if text.startswith("我要排隊:") or text.startswith("我要排隊："):
         if len(text) == 5:

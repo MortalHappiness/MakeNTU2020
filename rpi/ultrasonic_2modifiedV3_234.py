@@ -15,6 +15,8 @@
 # -----------------------
 import time
 import RPi.GPIO as GPIO
+import agent
+import os
 
 # -----------------------
 # Define some variables
@@ -27,7 +29,7 @@ if SERVER_HOST is None:
           'as environment variables.')
     exit()
 
-max_capacity = int(get_max_capacity(SERVER_HOST, "合益佳雞肉飯"))
+max_capacity = int(agent.get_max_capacity(SERVER_HOST, "合益佳雞肉飯"))
 
 # -----------------------
 # Define some functions
@@ -119,7 +121,8 @@ try:
                   if distance1 < 100 or distance1 > 250:
                       people = people + 1
                       if people <= max_capacity:
-                        update_current_people(SERVER_HOST, "合益佳雞肉飯","2-secret", people)
+                        print("Send request")
+                        agent.update_current_people(SERVER_HOST, "合益佳雞肉飯","2-secret", people)
                       break
                   if zz==4:
                       state = 1
@@ -128,14 +131,15 @@ try:
                   state=0
                   people-=1
                   if people >= 0:
-                    update_current_people(SERVER_HOST, "合益佳雞肉飯","2-secret", people)
+                    print("Send request")
+                    agent.update_current_people(SERVER_HOST, "合益佳雞肉飯","2-secret", people)
                   time.sleep(0.3)
                   break
               else:
                   time.sleep(0.3)
                   break
           
-      # print("people : ", people)
+      print("people : ", people)
       time.sleep(0.3)
 
 except KeyboardInterrupt:
