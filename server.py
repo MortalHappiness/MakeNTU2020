@@ -233,7 +233,7 @@ def get_reply(user_id, text):
                             {
                                 "type": "uri",
                                 "label": "地圖",
-                                "uri": "https://google.com"
+                                "uri": SERVER_HOST + "/api/map"
                             },
                             MessageTemplateAction(
                                 label="取消排隊",
@@ -255,7 +255,7 @@ def get_reply(user_id, text):
                             {
                                 "type": "uri",
                                 "label": "地圖",
-                                "uri": "https://google.com"
+                                "uri": SERVER_HOST + "/api/map"
                             },
                             MessageTemplateAction(
                                 label="我要排隊",
@@ -284,7 +284,7 @@ def get_reply(user_id, text):
                         {
                             "type": "uri",
                             "label": "地圖",
-                            "uri": "https://google.com"
+                            "uri": SERVER_HOST + "/api/map"
                         },
                     ]
                 )
