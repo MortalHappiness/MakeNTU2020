@@ -6,7 +6,14 @@ from pymongo import MongoClient
 
 from linebot import LineBotApi, WebhookHandler
 from linebot.exceptions import InvalidSignatureError
-from linebot.models import MessageEvent, TextMessage, TextSendMessage
+from linebot.models import (
+    MessageEvent,
+    TextMessage,
+    TextSendMessage,
+    TemplateSendMessage,
+    ButtonsTemplate,
+    MessageTemplateAction,
+)
 
 # ========================================
 
@@ -80,7 +87,7 @@ def callback():
 
 
 @app.route("/api/current-people", methods=['PUT'])
-def api():
+def api_current_people():
     if (type(request.json) != dict):
         abort(400)
     try:
@@ -110,7 +117,7 @@ def api():
 @ handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
     # Decide what Component to return to Channel
-    reply_text = get_reply(event.message.text)
+    reply_text = get_reply(event.source.user_id, event.message.text)
     line_bot_api.reply_message(
         event.reply_token,
         TextSendMessage(text=reply_text))
@@ -118,7 +125,7 @@ def handle_message(event):
 # ========================================
 
 
-def get_reply(text):
+def get_reply(user_id, text):
     """
     Given text, return reply text
     """
@@ -129,10 +136,21 @@ def get_reply(text):
 
     if text.startswith("#"):
         store_name = text[1:]
-        store = db.stores.find_one({"name": store_name}, {"_id": False})
+        store = db.stores.find_one({"name": store_name})
         if store is None:
             return f'Sorry, store "{store_name}" is not in our database!'
-        return str(store)
+        assert 0 <= store["current_people"] <= store["max_capacity"]
+        is_full = (store["current_people"] == store["max_capacity"])
+        is_queuing = db.stores.find_one(
+            {"name": store_name, "queuing_people": [user_id]})
+        if is_full:
+            if is_queuing:
+                return str(store)
+            else:  # not is_queuing
+                return (str(store) +
+                        "\n\nThe store is full now, do you want to queuing?")
+        else:  # not is_full
+            return str(store)
 
     return HELP_MESSAGE
 

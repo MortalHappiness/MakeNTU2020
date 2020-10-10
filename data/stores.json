@@ -4,7 +4,7 @@
     "secret_key": "store1-secret",
     "latitude": 23.5,
     "longitude": 121,
-    "max_capacity": 10
+    "max_capacity": 1
   },
   {
     "name": "store2",
