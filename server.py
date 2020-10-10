@@ -14,6 +14,7 @@ from linebot.models import (
     ButtonsTemplate,
     MessageTemplateAction,
 )
+import qrcode
 
 # ========================================
 
@@ -233,8 +234,8 @@ def get_reply(user_id, text):
             return TextSendMessage(text="該店尚有空位，不需排隊")
         if is_queuing is not None:
             queue_num = is_queuing["queuing_people"][0]["num"]
-            return TextSendMessage(
-                text=f"你已經正在排隊了！你的編號是{queue_num}號")
+            image = qrcode.make(user_id)
+            return (TextSendMessage(text=f"你已經正在排隊了！你的編號是{queue_num}號"),ImageSendMessage(image))
         try:
             max_num = store["queuing_people"][-1]["num"]
         except IndexError:
