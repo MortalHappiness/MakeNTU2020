@@ -50,9 +50,17 @@ db = mongo_client[MONGO_DB_NAME]
 
 # ========================================
 
-HELP_MESSAGE = """Welcome to LiningLine! The following is commands available:
+HELP_MESSAGE = """指令教學：
 
-help: display help message"""
+「help」: 顯示教學
+「店名」：查詢店家資訊
+「我要排隊：店名」：開始排隊
+
+範例：「邦食堂」
+「我要排隊：邦食堂」
+
+也可以從螢幕下方的選單顯示地圖與教學～
+祝您使用愉快 """
 
 # ========================================
 
@@ -121,6 +129,8 @@ def handle_message(event):
     line_bot_api.reply_message(
         event.reply_token,
         TextSendMessage(text=reply_text))
+
+
 
 # ========================================
 

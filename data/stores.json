@@ -1,23 +1,50 @@
 [
   {
-    "name": "store1",
-    "secret_key": "store1-secret",
-    "latitude": 23.5,
-    "longitude": 121,
+    "name": "微笑廚房",
+    "image":"smile.jpeg",
+    "secret_key": "微笑廚房-secret",
+    "latitude": 25.022005,
+    "longitude": 121.542518,
+    "max_capacity": 30
+  },
+  {
+    "name": "邦食堂",
+    "image":"banshokudou.png",
+    "secret_key": "邦食堂-secret",
+    "latitude": 25.022959,
+    "longitude": 121.542617,
     "max_capacity": 1
   },
   {
-    "name": "store2",
-    "secret_key": "store2-secret",
-    "latitude": 23.4,
-    "longitude": 122,
+    "name": "合益佳雞肉飯",
+    "image":"合益佳.jpg",
+    "secret_key": "合益佳-secret",
+    "latitude": 25.022140,
+    "longitude": 121.542513,
+    "max_capacity": 25
+  },
+  {
+    "name": "大李水餃",
+    "image":"大李.jpeg",
+    "secret_key": "大李-secret",
+    "latitude": 25.022069,
+    "longitude": 121.541364,
+    "max_capacity": 50
+  },
+  {
+    "name": "五九麵館",
+    "image":"五九.jpg",
+    "secret_key": "五九-secret",
+    "latitude": 25.022478,
+    "longitude": 121.542899,
     "max_capacity": 20
   },
   {
-    "name": "邦",
-    "secret_key": "bong-secret",
-    "latitude": 23.3,
-    "longitude": 123,
-    "max_capacity": 30
+    "name": "I'm Pasta",
+    "image":"impasta.jpg",
+    "secret_key": "pasta-secret",
+    "latitude": 25.022508,
+    "longitude": 121.542796,
+    "max_capacity": 40
   }
 ]
