@@ -1,4 +1,5 @@
 import os
+import json
 from io import BytesIO
 
 import qrcode
@@ -172,7 +173,7 @@ def api_stores():
              }
         ]
     )
-    return str(list(result))
+    return json.dumps(list(result))
 
 
 @app.route("/api/map/", methods=["GET"])

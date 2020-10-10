@@ -8,17 +8,29 @@ const googleMap = new Vue({
   methods: {
     initMap() {
       let location = {
-        lat: 25.02171,
-        lng: 121.542691,
+        lat: 25.022071,
+        lng: 121.543038
       };
       this.map = new google.maps.Map(document.getElementById("map"), {
         center: location,
-        zoom: 20,
+        zoom: 18,
         mapTypeId: "terrain",
+        zoomControl: false,
+        mapTypeControl: false,
+        scaleControl: false,
+        streetViewControl: false,
+        rotateControl: false,
+        fullscreenControl: false
       });
 
-      fetch("./map.geojson")
-        .then((results) => results.json())
+      fetch("/api/stores")
+        .then((results)=>results.json())
+        .then((data)=>{
+            const ret = {"type": "FeatureCollection","features":[]};
+            data.forEach(item=>{
+                ret.features.push({"type":"Feature","properties":{"id":item.latitude,"name":item.name,"max":item.max_capacity,"num":item.current_people,"queuing":item.queuing_num},"geometry":{"type":"Point","coordinates":[item.latitude,item.longitude]}}
+        )})
+            return ret;})
         .then((result) => {
           let res = result.features;
 
@@ -36,22 +48,35 @@ const googleMap = new Vue({
               },
               map: this.map,
             });
-            let full = 100;
-            let avaliable = 10;
+            let full = r.properties.max;
+            let num = r.properties.num;
+            let queuing = r.properties.queuing;
 
             var css = document.getElementById("css");
             var pie = document.getElementsByClassName("pie");
             var c = css.sheet;
             var str =
-              ".pie.pie::before{animation-delay:-" + (full - avaliable) + "s;}";
+              ".pie.pie::before{animation-delay:-" + (num/full) + "s;}";
+            let infowindow = null;
 
-            let infowindow = new google.maps.InfoWindow({
+            if (queuing===0){
+                infowindow = new google.maps.InfoWindow({
+                content:
+                  `<h4>${r.properties.name}</h4>` +
+                  `<h6>剩餘空位：${full-num}/${full}</h6>` +
+                  `<div class="pie"></div>`,
+              });
+             c.insertRule(str, 0);
+          } else{
+              infowindow = new google.maps.InfoWindow({
               content:
                 `<h4>${r.properties.name}</h4>` +
-                `<h6>剩餘空位：${avaliable}/${full}</h6>` +
+                `<h6>座位已滿，${queuing}人排隊中</h6>` +
                 `<div class="pie"></div>`,
             });
-            c.insertRule(str, 0);
+           c.insertRule(".pie.pie::before{animation-delay:-99.99s;}", 0);
+          }
+
 
             marker.addListener("click", (e) => {
               infowindow.open(this.map, marker);

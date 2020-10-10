@@ -7,13 +7,13 @@
     <title>MakeNTU2020</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
     <link rel="stylesheet" href="index.css">
-    <script>
+    <!-- <script>
         (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
         new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
         j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
         })(window,document,'script','dataLayer','GTM-PGQ9WQT');
-    </script>
+    </script> -->
 </head>
 <body>
     <noscript>
@@ -21,10 +21,15 @@
     </noscript>
   
     <div id="app" class="container">
-
+        <div class="row title" >
+            <div class="col-2"><img src="./img/line.png" width="50" height="50"></div>
+            <div class="col-10">
+                <h1>&nbsp;Lineline</h1>
+            </div>
+        </div>
         <div class="row">
             <div class="col">
-                <div id="map" class="embed-responsive embed-responsive-16by9"></div>
+                <div id="map" class="embed-responsive  embed-responsive-1by1"></div>
             </div>
         </div>
         <div class="row">
@@ -39,10 +44,28 @@
 
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDEox3rQZmLwbppyK0zamYZ_l7Pa3FGl0U" async defer></script>
     <script src="https://cdn.jsdelivr.net/npm/vue"></script>
-    <script src="map.js"></script>
+    <script src="/api/map/map.js"></script>
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
     <script src="http://www.flotcharts.org/flot/jquery.flot.js"></script>
     <script src="http://www.flotcharts.org/flot/jquery.flot.pie.js"></script>
     <style id="css"></style>
+    <!-- <script>
+            fetch("/api/map/map.geojson")
+                .then((results) => results.json())
+                .then((data)=>console.log(data));
+    
+
+            fetch("/api/stores")
+                .then((results)=>results.json())
+                .then((data)=>{
+                    const ret = {"type": "FeatureCollection","features":[]};
+                    data.forEach(item=>{
+                        ret.features.push({"type":"Feature","properties":{"id":item.latitude,"name":item.name},"geometry":{"type":"Point","coordinates":[item.latitude,item.longitude]}}
+                )})
+                    return ret;})
+                .then((data)=>{
+                    data.features.forEach(item=>{console.log(item.geometry.coordinates)})
+                });
+    </script> -->
 </body>
 </html>
