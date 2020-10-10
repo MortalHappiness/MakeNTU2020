@@ -28,6 +28,8 @@ if SERVER_HOST is None:
           'as environment variables.')
     exit()
 
+max_capacity = int(get_max_capacity(SERVER_HOST, "邦食堂"))
+
 # -----------------------
 # Define some functions
 # -----------------------
@@ -117,7 +119,8 @@ try:
                   #print("Distance1 : ", distance1)
                   if distance1 < 90 or distance1 > 250:
                       people = people + 1
-                      update_current_people(SERVER_HOST, "邦食堂","123", people)
+                      if people <= max_capacity:
+                        update_current_people(SERVER_HOST, "邦食堂","123", people)
                       break
                   if zz==2:
                       state = 1
@@ -125,7 +128,8 @@ try:
               if state==1:
                   state=0
                   people-=1
-                  update_current_people(SERVER_HOST, "邦食堂","123", people)
+                  if people>=0:
+                    update_current_people(SERVER_HOST, "邦食堂","123", people)
                   time.sleep(0.3)
                   break
               else:
