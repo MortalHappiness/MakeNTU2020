@@ -11,9 +11,13 @@ def update_current_people(url, store_name, secret_key, current_people):
     r = requests.put(url + "/api/current-people", json=payload)
     return r.ok, r.content, r.status_code
 
+
+def get_max_capacity(url, store_name):
+    r = requests.get(url + "/api/max-capacity?name=" + store_name)
+    return r.ok, r.content, r.status_code
+
 # ========================================
 
 
 if __name__ == '__main__':
-    print(update_current_people("http://localhost:8000", "store1",
-                                "store1-secret", 2))
+    print(get_max_capacity("http://localhost:8000", "邦食堂"))

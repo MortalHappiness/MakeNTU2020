@@ -144,6 +144,15 @@ def callback():
     return 'OK'
 
 
+@app.route("/api/max-capacity")
+def api_max_capacity():
+    store_name = request.args.get("name", None)
+    if store_name is None:
+        abort(400)
+    store = db.stores.find_one({"name": store_name})
+    return str(store["max_capacity"])
+
+
 @app.route("/api/current-people", methods=['PUT'])
 def api_current_people():
     if (type(request.json) != dict):
