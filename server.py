@@ -69,6 +69,7 @@ HELP_MESSAGE = """指令教學：
 「help」: 顯示教學
 「#店名」：查詢店家資訊
 「我要排隊：店名」：開始排隊
+「吃什麼」：顯示餐廳清單
 
 範例：
 「#邦食堂」
@@ -365,7 +366,7 @@ def get_reply(user_id, text):
         return TextSendMessage(text="取消排隊成功！")
 
       
-    if text == "List":
+    if text == "吃什麼":
         return TemplateSendMessage(
         alt_text='Carousel template',
         template=CarouselTemplate(
