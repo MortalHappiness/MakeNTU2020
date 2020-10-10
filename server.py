@@ -150,10 +150,30 @@ def api_qrcode(user_id):
     img_io.seek(0)
     return send_file(img_io, mimetype='image/jpeg')
 
+
+@app.route("/api/stores", methods=["GET"])
+def api_stores():
+    result = db.stores.aggregate(
+        [
+            {"$project":
+                {"_id": False,
+                 "name": True,
+                 "latitude": True,
+                 "longitude": True,
+                 "max_capacity": True,
+                 "current_people": True,
+                 "queuing_num":
+                    {"$size": "$queuing_people"}
+                 }
+             }
+        ]
+    )
+    return str(list(result))
+
 # ========================================
 
 
-@handler.add(MessageEvent, message=TextMessage)
+@ handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
     # Decide what Component to return to Channel
     reply = get_reply(event.source.user_id, event.message.text)
