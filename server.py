@@ -153,6 +153,7 @@ def api_max_capacity():
     store = db.stores.find_one({"name": store_name})
     return str(store["max_capacity"])
 
+
 @app.route("/api/last-num")
 def api_last_num():
     store_name = request.args.get("name", None)
@@ -160,6 +161,7 @@ def api_last_num():
         abort(400)
     store = db.stores.find_one({"name": store_name})
     return str(store["last_num"])
+
 
 @app.route("/api/current-people", methods=['PUT'])
 def api_current_people():
@@ -234,10 +236,10 @@ def api_session():
     username = request.form.get("username", None)
     password = request.form.get("password", None)
     if username is None or password is None:
-        abort(400)
+        return render_template("login.html", msg="Invalid username or password")
     result = db.stores.find_one({"name": username, "secret_key": password})
     if result is None:
-        abort(403)
+        return render_template("login.html", msg="Invalid username or password")
     session["username"] = username
     return "Login successfully!", 200
 
@@ -253,7 +255,8 @@ def api_pop_user():
                                     {"queuing_people.$": True}
                                     )
     if is_queuing is None:
-        return "The user is not queuing now!"
+        return render_template("popuser.html",
+                               msg="The user is not queuing now!")
     queuing_num = is_queuing["queuing_people"][0]["num"]
     result = db.stores.aggregate([
         {"$match": {"name": store_name}},
@@ -264,7 +267,8 @@ def api_pop_user():
          }])
     queuing_index = list(result)[0]["matchedIndex"]
     if queuing_index != 0:
-        return "The user is not line at the first!"
+        return render_template("popuser.html",
+                               msg="The user is not line at the first!")
     store = db.stores.find_one({"name": store_name})
     if len(store["queuing_people"]) == 1:
         queuing_num = 0
@@ -284,7 +288,7 @@ def api_pop_user():
             TextSendMessage(
                 text=f"{store['name']}的排隊快輪到您了，請留意排隊進度"))
 
-    return "Successfully pop the user!"
+    return render_template("popuser.html", msg="Successfully pop the user!")
 
 # ========================================
 
