@@ -199,7 +199,7 @@ def handle_message(event):
 
 # ========================================
 
-QuickReply_text_message = TextSendMessage(
+QuickReply_text_message_help = TextSendMessage(
     text = HELP_MESSAGE,
         quick_reply = QuickReply(
             items = [ 
@@ -220,6 +220,69 @@ QuickReply_text_message = TextSendMessage(
                 )
             ] ) ) 
 
+QuickReply_text_message_nostore = TextSendMessage(
+    text = "抱歉，查無此店",
+        quick_reply = QuickReply(
+            items = [ 
+                QuickReplyButton(
+                    action = MessageAction(label = "#邦食堂", text = "#邦食堂"), 
+                ), 
+                QuickReplyButton( 
+                      action = MessageAction(label = "#微笑廚房", text = "#微笑廚房"), 
+                ), 
+                QuickReplyButton( 
+                    action = MessageAction(label = "#五九麵館", text = "#五九麵館"), 
+                ), 
+                QuickReplyButton( 
+                    action = MessageAction(label = "#大李水餃", text = "#大李水餃"), 
+                ),
+                QuickReplyButton( 
+                    action = MessageAction(label = "#合益佳雞肉飯", text = "#合益佳雞肉飯"), 
+                )
+            ] ) ) 
+
+QuickReply_text_message_nostore_lineup = TextSendMessage(
+    text = "抱歉，查無此店",
+        quick_reply = QuickReply(
+            items = [ 
+                QuickReplyButton(
+                    action = MessageAction(label = "我要排隊：邦食堂", text = "我要排隊：邦食堂"), 
+                ), 
+                QuickReplyButton( 
+                      action = MessageAction(label = "我要排隊：微笑廚房", text = "我要排隊：微笑廚房"), 
+                ), 
+                QuickReplyButton( 
+                    action = MessageAction(label = "我要排隊：五九麵館", text = "我要排隊：五九麵館"), 
+                ), 
+                QuickReplyButton( 
+                    action = MessageAction(label = "我要排隊：大李水餃", text = "我要排隊：大李水餃"), 
+                ),
+                QuickReplyButton( 
+                    action = MessageAction(label = "我要排隊：合益佳雞肉飯", text = "我要排隊：合益佳雞肉飯"), 
+                )
+            ] ) ) 
+
+QuickReply_text_message_nostore_cancel = TextSendMessage(
+    text = "抱歉，查無此店",
+        quick_reply = QuickReply(
+            items = [ 
+                QuickReplyButton(
+                    action = MessageAction(label = "取消排隊：邦食堂", text = "取消排隊：邦食堂"), 
+                ), 
+                QuickReplyButton( 
+                      action = MessageAction(label = "取消排隊：微笑廚房", text = "取消排隊：微笑廚房"), 
+                ), 
+                QuickReplyButton( 
+                    action = MessageAction(label = "取消排隊：五九麵館", text = "取消排隊：五九麵館"), 
+                ), 
+                QuickReplyButton( 
+                    action = MessageAction(label = "取消排隊：大李水餃", text = "取消排隊：大李水餃"), 
+                ),
+                QuickReplyButton( 
+                    action = MessageAction(label = "取消排隊：合益佳雞肉飯", text = "取消排隊：合益佳雞肉飯"), 
+                )
+            ] ) ) 
+
 def get_reply(user_id, text):
     """
     Given text, return reply text
@@ -227,13 +290,13 @@ def get_reply(user_id, text):
     text = text.strip()
 
     if text in ["#", "help"]:
-        return QuickReply_text_message
+        return QuickReply_text_message_help
 
     if text.startswith("#"):
         store_name = text[1:]
         store = db.stores.find_one({"name": store_name})
         if store is None:
-            return TextSendMessage(text=f'抱歉，查無此店')
+            return QuickReply_text_message_nostore
         assert 0 <= store["current_people"] <= store["max_capacity"]
         is_full = (store["current_people"] == store["max_capacity"])
         is_queuing = db.stores.find_one({"name": store_name,
@@ -337,7 +400,7 @@ def get_reply(user_id, text):
         store_name = text[5:].strip()
         store = db.stores.find_one({"name": store_name})
         if store is None:
-            return (TextSendMessage(text=f'抱歉，查無此店'),QuickReply_text_message)
+            return QuickReply_text_message_nostore_lineup
         is_full = (store["current_people"] == store["max_capacity"])
         is_queuing = db.stores.find_one({"name": store_name,
                                          "queuing_people.user_id": user_id},
@@ -376,7 +439,7 @@ def get_reply(user_id, text):
         store_name = text[5:].strip()
         store = db.stores.find_one({"name": store_name})
         if store is None:
-            return TextSendMessage(text=f'抱歉，查無此店')
+            return QuickReply_text_message_nostore_cancel
         is_queuing = db.stores.find_one({"name": store_name,
                                          "queuing_people.user_id": user_id},
                                         {"queuing_people.$": True}
@@ -503,7 +566,7 @@ def get_reply(user_id, text):
         )
 
 
-    return QuickReply_text_message
+    return QuickReply_text_message_help
 
 # ========================================
 
