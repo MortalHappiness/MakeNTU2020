@@ -639,8 +639,9 @@ def get_reply(user_id, text):
                     CarouselColumn(
                         thumbnail_image_url=SERVER_HOST +
                         "/images/" + "smile.jpeg",
+                        image_aspect_ratio="square",
                         title='微笑廚房',
-                        text='106台北市大安區和平東路二段118巷54弄3號',
+                        text='106台北市大安區和平東路二段118巷54弄3號\n4.0顆星',
                         actions=[
                             {
                                 "type": "uri",
@@ -657,8 +658,9 @@ def get_reply(user_id, text):
                     CarouselColumn(
                         thumbnail_image_url=SERVER_HOST +
                         "/images/" + "大李.jpeg",
+                        image_aspect_ratio="square",
                         title='大李水餃',
-                        text='106台北市大安區和平東路二段118巷54弄35號',
+                        text='106台北市大安區和平東路二段118巷54弄35號\n3.8顆星',
                         actions=[
                             {
                                 "type": "uri",
@@ -675,8 +677,9 @@ def get_reply(user_id, text):
                     CarouselColumn(
                         thumbnail_image_url=SERVER_HOST +
                         "/images/" + "五九.jpg",
+                        image_aspect_ratio="square",
                         title='五九麵館',
-                        text='106台北市大安區和平東路二段118巷57-1號',
+                        text='106台北市大安區和平東路二段118巷57-1號\n4.1顆星',
                         actions=[
                             {
                                 "type": "uri",
@@ -693,8 +696,9 @@ def get_reply(user_id, text):
                     CarouselColumn(
                         thumbnail_image_url=SERVER_HOST +
                         "/images/" + "合益佳.jpg",
+                        image_aspect_ratio="square",
                         title='合益佳雞肉飯',
-                        text='106台北市大安區和平東路二段118巷54弄7號',
+                        text='106台北市大安區和平東路二段118巷54弄7號\n4.1顆星',
                         actions=[
                             {
                                 "type": "uri",
@@ -711,8 +715,9 @@ def get_reply(user_id, text):
                     CarouselColumn(
                         thumbnail_image_url=SERVER_HOST +
                         "/images/" + "banshokudou.png",
+                        image_aspect_ratio="square",
                         title='邦食堂',
-                        text='106台北市大安區和平東路二段96巷17弄28號',
+                        text='106台北市大安區和平東路二段96巷17弄28號\n4.1顆星',
                         actions=[
                             {
                                 "type": "uri",

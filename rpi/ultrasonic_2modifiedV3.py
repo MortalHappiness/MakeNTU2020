@@ -22,14 +22,11 @@ import os
 # Define some variables
 # -----------------------
 
-SERVER_HOST = os.getenv('SERVER_HOST', None)
+SERVER_HOST = "https://8bf4a0aa7836.ngrok.io"
 
-if SERVER_HOST is None:
-    print('Please specify SERVER_HOST ' +
-          'as environment variables.')
-    exit()
-
-max_capacity = int(agent.get_max_capacity(SERVER_HOST, "邦食堂"))
+is_ok, content, status_code = agent.get_max_capacity(SERVER_HOST, "邦食堂")
+if is_ok:
+    max_capacity = int(content)
 
 # -----------------------
 # Define some functions
@@ -139,7 +136,7 @@ try:
                   time.sleep(0.3)
                   break
           
-      # print("people : ", people)
+      print("people : ", people)
       time.sleep(0.3)
 
 except KeyboardInterrupt:
