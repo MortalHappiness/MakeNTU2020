@@ -256,7 +256,7 @@ def api_pop_user():
                                     )
     if is_queuing is None:
         return render_template("popuser.html",
-                               msg="The user is not queuing now!")
+                               msg="該使用者尚未排隊，請告知他LineLine排隊功能。")
     queuing_num = is_queuing["queuing_people"][0]["num"]
     result = db.stores.aggregate([
         {"$match": {"name": store_name}},
@@ -268,7 +268,7 @@ def api_pop_user():
     queuing_index = list(result)[0]["matchedIndex"]
     if queuing_index != 0:
         return render_template("popuser.html",
-                               msg="The user is not line at the first!")
+                               msg="還沒排到該使用者，請他再稍待片刻。")
     store = db.stores.find_one({"name": store_name})
     if len(store["queuing_people"]) == 1:
         queuing_num = 0
@@ -288,7 +288,7 @@ def api_pop_user():
             TextSendMessage(
                 text=f"{store['name']}的排隊快輪到您了，請留意排隊進度"))
 
-    return render_template("popuser.html", msg="Successfully pop the user!")
+    return render_template("popuser.html", msg="成功進入店家!")
 
 # ========================================
 
@@ -562,7 +562,7 @@ def get_reply(user_id, text):
                                          "queuing_people.user_id": user_id},
                                         {"queuing_people.$": True}
                                         )
-        if not is_full:
+        if not is_full and len(store["queuing_people"]) == 0:
             return TextSendMessage(text="該店尚有空位，不需排隊")
         if is_queuing is not None:
             queue_num = is_queuing["queuing_people"][0]["num"]
