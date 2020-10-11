@@ -50,13 +50,14 @@ const googleMap = new Vue({
             });
             let full = r.properties.max;
             let num = r.properties.num;
+            // let full = 100
+            // let num = 20
             let queuing = r.properties.queuing;
 
             var css = document.getElementById("css");
             var pie = document.getElementsByClassName("pie");
             var c = css.sheet;
-            var str =
-              ".pie.pie::before{animation-delay:-" + (num/full) + "s;}";
+            var str =".pie.pie::before{animation-delay:-" + (num/full)*100 + "s;}";
             let infowindow = null;
 
             if (full!==num){
@@ -66,7 +67,7 @@ const googleMap = new Vue({
                   `<h6>剩餘空位：${full-num}/${full}</h6>` +
                   `<div class="pie"></div>`,
               });
-             c.insertRule(str, 0);
+              str =".pie.pie::before{animation-delay:-" + (num/full)*100 + "s;}";
           } else{
               infowindow = new google.maps.InfoWindow({
               content:
@@ -74,8 +75,9 @@ const googleMap = new Vue({
                 `<h6>座位已滿，${queuing}人排隊中</h6>` +
                 `<div class="pie"></div>`,
             });
-           c.insertRule(".pie.pie::before{animation-delay:-99.99s;}", 0);
-          }
+            str =".pie.pie::before{animation-delay:-99.99s;}";
+          };
+          c.insertRule(str, 0);
 
 
             marker.addListener("click", (e) => {
