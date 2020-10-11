@@ -14,7 +14,7 @@
     "secret_key": "123",
     "latitude": 25.022959,
     "longitude": 121.542617,
-    "max_capacity": 1,
+    "max_capacity": 10,
     "fanpage": "https://www.facebook.com/banfoodplace/"
   },
   {
