@@ -59,7 +59,7 @@ const googleMap = new Vue({
               ".pie.pie::before{animation-delay:-" + (num/full) + "s;}";
             let infowindow = null;
 
-            if (queuing===0){
+            if (full!==num){
                 infowindow = new google.maps.InfoWindow({
                 content:
                   `<h4>${r.properties.name}</h4>` +
